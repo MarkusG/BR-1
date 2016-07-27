@@ -10,28 +10,17 @@ namespace BR_1
 {
     class Steam
     {
+        public static Dictionary<int, string> NameDict { get; set; }
         static string APIKey;
-        public static void Initialize()
+
+        public static void GetAPIKey()
         {
             Console.WriteLine("Enter your Steam API key:");
             APIKey = Console.ReadLine();
         }
-        public static OwnedGames GetOwnedGames(long Id)
+        public static void InitializeNameDict()
         {
-            WebClient Client = new WebClient();
-            var DataBuffer = Client.DownloadData($"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={APIKey}&steamid={Id}&format=json");
-            Client.Dispose();
-            string Data = Encoding.ASCII.GetString(DataBuffer);
-            return JsonConvert.DeserializeObject<OwnedGames>(Data);
-        }
-    }
-    class AppNameDict
-    {
-        public static Dictionary<int, string> Name { get; set; }
-
-        public static void Initialize()
-        {
-            Name = new Dictionary<int, string>();
+            NameDict = new Dictionary<int, string>();
 
             Console.WriteLine("Acquiring app IDs and names from Steam...");
 
@@ -43,9 +32,17 @@ namespace BR_1
 
             Console.WriteLine("Initializing the app/name dictionary...");
 
-            foreach (App a in Response.applist.apps) { Name.Add(a.appid, a.name); }
+            foreach (App a in Response.applist.apps) { NameDict.Add(a.appid, a.name); }
 
             Console.WriteLine("App/name dictionary initialized.");
+        }
+        public static OwnedGames GetOwnedGames(long Id)
+        {
+            WebClient Client = new WebClient();
+            var DataBuffer = Client.DownloadData($"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={APIKey}&steamid={Id}&format=json");
+            Client.Dispose();
+            string Data = Encoding.ASCII.GetString(DataBuffer);
+            return JsonConvert.DeserializeObject<OwnedGames>(Data);
         }
     }
     class OwnedGame

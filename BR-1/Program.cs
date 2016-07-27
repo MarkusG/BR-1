@@ -19,8 +19,10 @@ namespace BR_1
         {
             Console.WriteLine("Enter the bot's token:");
             string token = Console.ReadLine();
-            Steam.Initialize();
-            AppNameDict.Initialize();
+            Steam.GetAPIKey();
+            Console.WriteLine();
+            Steam.InitializeNameDict();
+            Console.WriteLine();
 
             _client = new DiscordClient(x => // Create the _client object and set its values
             {
