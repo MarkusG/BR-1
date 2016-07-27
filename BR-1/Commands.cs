@@ -186,6 +186,34 @@ namespace BR_1
                     else { await e.Channel.SendMessage("You don't have access to that command."); }
                 });
             #endregion
+            #region !findcommongames
+            cService.CreateCommand("findcommongames")
+                .Description("Compare a number of Steam profiles and find all the common games between them.")
+                .Parameter("SteamIDs", ParameterType.Multiple)
+                .Do(async (e) =>
+                {
+                    int NumberOfProfiles = e.Args.Count();
+                    List<List<int>> PlayersOwnedGames = new List<List<int>>();
+
+                    foreach (string a in e.Args)
+                    {
+                        long arg = long.Parse(a);
+                        List<int> Games = (from g in Steam.GetOwnedGames(arg).response.games
+                                           select g.appid).ToList();
+                        PlayersOwnedGames.Add(Games);
+                    }
+
+                    List<int> CommonGames = PlayersOwnedGames[0];
+
+                    for (int i = 0; i < e.Args.Count(); i++) { CommonGames = CommonGames.Intersect(PlayersOwnedGames[i]).ToList(); }
+
+                    string MessageResponse = "All of the Steam users share the following games: ```";
+                    foreach (int i in CommonGames) { MessageResponse += $"{AppNameDict.Name[i]}\n"; }
+                    MessageResponse += "```";
+
+                    await e.Channel.SendMessage(MessageResponse);
+                });
+            #endregion
             #region !pp
             //cService.CreateCommand("pp")
             //    .Do(async (e) =>
